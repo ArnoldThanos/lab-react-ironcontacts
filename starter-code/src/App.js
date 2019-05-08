@@ -1,18 +1,92 @@
 import React, { Component } from 'react';
 import logo from './logo.svg';
+
+import contacts from './contacts.json';
 import './App.css';
 
+
 class App extends Component {
+  constructor() {
+    super();
+    this.state = {
+      contacts,
+      firstContacts: contacts.slice(0, 5),
+    };
+
+    this.randomContacts = this.randomContacts.bind(this);
+    this.sortedContacts = this.sortedContacts.bind(this);
+    this.sortedByPopularity = this.sortedByPopularity.bind(this);
+  }
+
+  randomContacts() {
+    const newArr = [...this.state.firstContacts];
+    const randomContact = this.state.contacts[Math.floor(Math.random() * this.state.contacts.length - 1)];
+    if (!newArr.includes(randomContact)) {
+      newArr.push(randomContact);
+    }
+    this.setState({
+      firstContacts: newArr,
+    });
+  }
+
+  sortedContacts() {
+    const newArr = [...this.state.firstContacts];
+    const sortedContacts = newArr.sort((a, b) => {
+      if (a.name < b.name) { return -1; }
+      if (a.name > b.name) { return 1 ;}
+      return 0;
+    });
+    this.setState({
+      firstContacts: sortedContacts,
+    });
+  }
+
+  sortedByPopularity() {
+    const newArr = [...this.state.firstContacts];
+    const sortedContacts = newArr.sort((a, b) => {
+      if (a.popularity > b.popularity) { return -1 ;}
+      if (a.popularity < b.popularity) { return 1 ;}
+      return 0;
+    });
+    this.setState({
+      firstContacts: sortedContacts,
+    });
+  }
+
+  deleteContact(idx) {
+    const newArr = [...this.state.firstContacts];
+    newArr.splice(idx,1);
+    this.setState({
+      firstContacts: newArr,
+    });
+  }
+
   render() {
+    const arr = this.state.firstContacts.map((e, idx) => (
+      <tr>
+        <td><img src={e.pictureUrl} width="70" height="70" alt="photo" /></td>
+        <td>{e.name}</td>
+        <td>{e.popularity}</td>
+        <button key = {idx} onClick={() => this.deleteContact(idx)}>Delete</button>
+      </tr>
+    ));
+
+
     return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <h1 className="App-title">Welcome to React</h1>
-        </header>
-        <p className="App-intro">
-          To get started, edit <code>src/App.js</code> and save to reload.
-        </p>
+      <div className="list">
+        <h1>IronContacts</h1>
+        <button onClick={this.randomContacts}>Add Random Contacts</button>
+        <button onClick={this.sortedContacts}>Sort by name</button>
+        <button onClick={this.sortedByPopularity}>Sort by popularity</button>
+        <table>
+          <tr>
+            <th>photo</th>
+            <th>name</th>
+            <th>popularity</th>
+            <th>action</th>
+          </tr>
+          {arr}
+        </table>
       </div>
     );
   }
